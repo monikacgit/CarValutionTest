@@ -1,0 +1,48 @@
+package tests;
+
+import data.CarDataReader;
+import model.CarInfo;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.*;
+import pages.CarValuationPage;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import static org.testng.Assert.*;
+
+public class CarValuationTest {
+    private WebDriver driver;
+    private CarValuationPage valuationPage;
+    private CarDataReader dataReader;
+
+    @BeforeClass
+    public void setup() {
+        driver = new ChromeDriver();
+        valuationPage = new CarValuationPage(driver);
+        dataReader = new CarDataReader();
+    }
+
+    @Test
+    public void verifyCarValuations() throws IOException {
+        List<String> regNumbers = dataReader.getRegistrationNumbers("car_input.txt");
+        Map<String, CarInfo> expectedData = dataReader.loadExpectedData("car_output.txt");
+
+        for (String regNumber : regNumbers) {
+            CarInfo expectedInfo = expectedData.get(regNumber);
+            CarInfo actualInfo = valuationPage.fetchCarInfo(regNumber, "10000");
+
+            assertNotNull(actualInfo, "Expected info for registration " + regNumber);
+            assertEquals(actualInfo, expectedInfo, "Mismatch for registration " + regNumber);
+        }
+    }
+
+    @AfterClass
+    public void teardown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+}

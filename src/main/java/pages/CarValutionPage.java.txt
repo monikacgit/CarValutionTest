@@ -1,0 +1,39 @@
+package pages;
+
+import model.CarInfo;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+public class CarValuationPage {
+    private WebDriver driver;
+
+    @FindBy(id = "registration-input") private WebElement regInput;
+    @FindBy(id = "mileage-input") private WebElement mileageInput;
+    @FindBy(id = "get-valuation-button") private WebElement searchButton;
+    @FindBy(id = "car-make") private WebElement carMake;
+    @FindBy(id = "car-model") private WebElement carModel;
+    @FindBy(id = "car-year") private WebElement carYear;
+
+    public CarValuationPage(WebDriver driver) {
+        this.driver = driver;
+        PageFactory.initElements(driver, this);
+    }
+
+    public CarInfo fetchCarInfo(String regNumber, String mileage) {
+        regInput.clear();
+        regInput.sendKeys(regNumber);
+        mileageInput.clear();
+        mileageInput.sendKeys(mileage);
+        searchButton.click();
+
+        // Build a CarInfo object from retrieved data
+        return new CarInfo(
+            carMake.getText(),
+            carModel.getText(),
+            carYear.getText(),
+            regNumber
+        );
+    }
+}
